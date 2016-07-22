@@ -1,1 +1,1 @@
-include ':aidlserversample', ':aidlclientsample'
+include ':aidlserversample', ':aidlclientsample', ':processbymsgserver', ':processbymessageclient'
