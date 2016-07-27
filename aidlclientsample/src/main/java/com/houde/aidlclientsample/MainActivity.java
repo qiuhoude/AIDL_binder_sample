@@ -51,11 +51,11 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onServiceDisconnected(ComponentName name) {
             Log.e("client", "onServiceDisconnected");
-            try {
-                mCalcAidl.unregisterCallback(callback);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
+//            try {
+//                mCalcAidl.unregisterCallback(callback);
+//            } catch (RemoteException e) {
+//                e.printStackTrace();
+//            }
             mCalcAidl = null;
         }
 

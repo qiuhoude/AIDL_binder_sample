@@ -53,11 +53,13 @@ public class CalcService extends Service {
 
         @Override
         public int add(int x, int y) {
+            Log.e(TAG,"server add run");
             return x + y;
         }
 
         @Override
         public int min(int x, int y) {
+            Log.e(TAG, "server min run");
             return x - y;
         }
 
@@ -68,6 +70,7 @@ public class CalcService extends Service {
 
         @Override
         public void registerCallback(IRemoteCallback cb) throws RemoteException {
+            Log.e(TAG, "server registerCallback run");
             mCallback = cb;
             task = new RecordTask();
             uiHander.postDelayed(task, 1000);
@@ -75,7 +78,7 @@ public class CalcService extends Service {
 
         @Override
         public void unregisterCallback(IRemoteCallback cb) throws RemoteException {
-
+            Log.e(TAG, "server unregisterCallback run");
             mCallback = null;
             uiHander.removeCallbacks(task);
             task = null;
@@ -95,6 +98,7 @@ public class CalcService extends Service {
 
         @Override
         public void run() {
+            Log.d("qiu","server RecordTask run");
             if (mCallback != null) {
                 try {
                     mCallback.onDataUpdate(20, duration, 10);
