@@ -17,6 +17,15 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    sourceSets {
+        main {
+            //解决AIDL传输复杂类型找不到包的问题
+            //把src/main/aidl文件也作为Java.srcDirs， resources.srcDirs。
+            java.srcDirs = ['src/main/java', 'src/main/aidl']
+
+        }
+    }
 }
 
 dependencies {

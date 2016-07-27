@@ -6,12 +6,18 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.RemoteException;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
 import com.houde.aidlserversample.ICalcAIDL;
+import com.houde.aidlserversample.IRemoteCallback;
+import com.houde.aidlserversample.Person;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -22,7 +28,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
     }
 
     @Override
@@ -32,10 +37,25 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    class RemoteCallback extends IRemoteCallback.Stub {
+
+        @Override
+        public void onDataUpdate(double distance, double duration, double velocity) throws RemoteException {
+            Toast.makeText(MainActivity.this, String.format("distance %d duration %d velocity %d",
+                    distance, duration, velocity), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private RemoteCallback callback;
     private ServiceConnection mServiceConn = new ServiceConnection() {
         @Override
         public void onServiceDisconnected(ComponentName name) {
             Log.e("client", "onServiceDisconnected");
+            try {
+                mCalcAidl.unregisterCallback(callback);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
             mCalcAidl = null;
         }
 
@@ -198,4 +218,57 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
+    public void complexObj(View view) throws RemoteException {
+        if (mCalcAidl != null) {
+            Person person = new Person();
+            person.setName("houde");
+            person.setSex(1);
+            List<String> hobbys = new ArrayList<>();
+            hobbys.add("骑车");
+            hobbys.add("打球");
+            person.setHobby(hobbys);
+            String str = mCalcAidl.showPerson(person);
+            Toast.makeText(this, str + "", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "服务端未绑定或被异常杀死，请重新绑定服务端", Toast.LENGTH_SHORT)
+                    .show();
+        }
+    }
+
+    public void startRemoteCallback(View view) {
+
+
+        if (mCalcAidl != null) {
+            if (callback == null) {
+                callback = new RemoteCallback();
+            }
+            try {
+                mCalcAidl.registerCallback(callback);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+            Toast.makeText(this, "startRemoteCallback", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "服务端未绑定或被异常杀死，请重新绑定服务端", Toast.LENGTH_SHORT)
+                    .show();
+        }
+    }
+
+
+    public void stopRemoteCallback(View view) {
+        if (mCalcAidl != null) {
+
+            try {
+                mCalcAidl.unregisterCallback(callback);
+                callback = null;
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+            Toast.makeText(this, "stopRemoteCallback", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "服务端未绑定或被异常杀死，请重新绑定服务端", Toast.LENGTH_SHORT)
+                    .show();
+        }
+    }
 }
